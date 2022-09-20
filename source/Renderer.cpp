@@ -38,19 +38,21 @@ void Renderer::Render(Scene* pScene) const
 			Vector3 rayDirection{ x,y,1};
 			rayDirection.Normalize();
 			
-			Ray viewRay{ {0,0,0},rayDirection };
+			Ray viewRay{ {0,0,-50},rayDirection };
 
 			ColorRGB finalColor{};
 
 			HitRecord closestHit{};
 
-			Sphere testSphere{ {0.f,0.f,100.f},50.f,0 };
+			pScene->GetClosestHit(viewRay, closestHit);
 
-			GeometryUtils::HitTest_Sphere(testSphere, viewRay, closestHit);
+			//GeometryUtils::HitTest_Sphere(testSphere, viewRay, closestHit);
 
 			if (closestHit.didHit)
 			{
 				finalColor = materials[closestHit.materialIndex]->Shade();
+				//const float scaled_t = (closestHit.t - 50.f) / 40.f;
+				//finalColor = { scaled_t,scaled_t,scaled_t };
 			}
 
 			

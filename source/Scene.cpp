@@ -28,8 +28,29 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
-		//todo W1
-		assert(false && "No Implemented Yet!");
+
+		HitRecord tempHit1{};
+		HitRecord tempHit2{};
+		tempHit2.t = FLT_MAX;
+		bool hashit{};
+		
+		for (const Sphere sphere : m_SphereGeometries)
+		{
+			GeometryUtils::HitTest_Sphere(sphere, ray, tempHit1);
+			if (tempHit1.t < tempHit2.t)
+			{
+				tempHit2 = tempHit1;
+			}
+		}
+		for (const Plane plane : m_PlaneGeometries)
+		{
+			GeometryUtils::HitTest_Plane(plane, ray, tempHit1);
+			if (tempHit1.t < tempHit2.t)
+			{
+				tempHit2 = tempHit1;
+			}
+		}
+		closestHit = tempHit2;
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
@@ -116,11 +137,11 @@ namespace dae {
 		const unsigned char matId_Solid_Magenta = AddMaterial(new Material_SolidColor{ colors::Magenta });
 
 		//Spheres
-		AddSphere({ -25.f, 0.f, 100.f }, 50.f, matId_Solid_Red);
+		AddSphere({-25.f, 0.f, 100.f}, 50.f, matId_Solid_Red);
 		AddSphere({ 25.f, 0.f, 100.f }, 50.f, matId_Solid_Blue);
 
 		//Plane
-		AddPlane({ -75.f, 0.f, 0.f }, { 1.f, 0.f,0.f }, matId_Solid_Green);
+		AddPlane({-75.f, 0.f, 0.f}, {1.f, 0.f,0.f}, matId_Solid_Green);
 		AddPlane({ 75.f, 0.f, 0.f }, { -1.f, 0.f,0.f }, matId_Solid_Green);
 		AddPlane({ 0.f, -75.f, 0.f }, { 0.f, 1.f,0.f }, matId_Solid_Yellow);
 		AddPlane({ 0.f, 75.f, 0.f }, { 0.f, -1.f,0.f }, matId_Solid_Yellow);

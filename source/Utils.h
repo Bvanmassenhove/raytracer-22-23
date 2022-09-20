@@ -3,6 +3,7 @@
 #include <fstream>
 #include "Math.h"
 #include "DataTypes.h"
+#include <iostream>
 
 namespace dae
 {
@@ -15,11 +16,27 @@ namespace dae
 			//todo W1
 			
 			Vector3 rayToSphere{ sphere.origin - ray.origin };
-			Vector3 rayToPerpendicular;
-			rayToPerpendicular.Dot(rayToSphere, ray.direction);
-			float originToPerpendicularSquared{ rayToSphere.Magnitude() * 2 - rayToPerpendicular.Magnitude() * 2};
-			float intercectPoint{ sqrt((sphere.radius * 2) - (originToPerpendicularSquared * 2)) };
-			return false;
+			float rayToPerpendicular{ Vector3::Dot(rayToSphere, ray.direction) };
+
+			float originToPerpendicularSquared{ rayToSphere.Magnitude() * 2 - rayToPerpendicular * 2};
+			if (sqrt(originToPerpendicularSquared) < sphere.radius)
+			{
+				float intercectPoint{ sqrt((sphere.radius * 2) - (originToPerpendicularSquared * 2)) };
+				float rayToIntersect{ rayToPerpendicular - intercectPoint };
+				Vector3 intersectVector{ ray.origin + ray.direction * rayToIntersect };
+				if (intersectVector.Magnitude() > 0.0001f)
+				{
+					hitRecord.didHit = true;
+					hitRecord.materialIndex = sphere.materialIndex;
+					hitRecord.normal = intersectVector - sphere.origin;
+					hitRecord.normal.Normalize();
+					hitRecord.origin = intersectVector;
+					hitRecord.t = -intersectVector.Magnitude();
+
+					return true;
+				}
+			}
+			return false;		
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
@@ -33,8 +50,20 @@ namespace dae
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			assert(false && "No Implemented Yet!");
-			return false;
+			float rayToIntersect = Vector3::Dot((plane.origin - ray.direction), plane.normal) / Vector3::Dot(ray.direction, plane.normal);
+			if (rayToIntersect > 0.00001 && rayToIntersect < FLT_MAX)
+			{
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = plane.materialIndex;
+				hitRecord.normal = plane.normal;
+				hitRecord.origin = ray.origin + rayToIntersect*ray.direction;
+				hitRecord.t = rayToIntersect;
+				return true ;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray)
