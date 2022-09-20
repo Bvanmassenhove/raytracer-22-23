@@ -22,7 +22,7 @@ namespace dae {
 			delete pMaterial;
 			pMaterial = nullptr;
 		}
-
+		
 		m_Materials.clear();
 	}
 

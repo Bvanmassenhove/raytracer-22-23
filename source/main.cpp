@@ -47,7 +47,7 @@ int main(int argc, char* args[])
 
 	const auto pScene = new Scene_W1();
 	pScene->Initialize();
-
+	
 	//Start loop
 	pTimer->Start();
 	float printTimer = 0.f;

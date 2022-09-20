@@ -26,16 +26,36 @@ void Renderer::Render(Scene* pScene) const
 	Camera& camera = pScene->GetCamera();
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
-
+	
+	//loop over pixels
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			float gradient = px / static_cast<float>(m_Width);
-			gradient += py / static_cast<float>(m_Width);
-			gradient /= 2.0f;
+			float x = ((2 * ((px + 0.5f) / m_Width)) -1) * (float(m_Width) / float(m_Height));
+			float y = (1 - 2 * ((py + 0.5f) / m_Height));
 
-			ColorRGB finalColor{ gradient, gradient, gradient };
+			Vector3 rayDirection{ x,y,1};
+			rayDirection.Normalize();
+			
+			Ray viewRay{ {0,0,0},rayDirection };
+
+			ColorRGB finalColor{};
+
+			HitRecord closestHit{};
+
+			Sphere testSphere{ {0.f,0.f,100.f},50.f,0 };
+
+			GeometryUtils::HitTest_Sphere(testSphere, viewRay, closestHit);
+
+			if (closestHit.didHit)
+			{
+				finalColor = materials[closestHit.materialIndex]->Shade();
+			}
+
+			
+
+			
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();

@@ -13,7 +13,12 @@ namespace dae
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			assert(false && "No Implemented Yet!");
+			
+			Vector3 rayToSphere{ sphere.origin - ray.origin };
+			Vector3 rayToPerpendicular;
+			rayToPerpendicular.Dot(rayToSphere, ray.direction);
+			float originToPerpendicularSquared{ rayToSphere.Magnitude() * 2 - rayToPerpendicular.Magnitude() * 2};
+			float intercectPoint{ sqrt((sphere.radius * 2) - (originToPerpendicularSquared * 2)) };
 			return false;
 		}
 
