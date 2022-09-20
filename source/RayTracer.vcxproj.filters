@@ -8,12 +8,14 @@
     <Filter Include="Misc">
       <UniqueIdentifier>{72056cb6-72a2-42b7-b05e-376f1ddd957e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="renderer">
+      <UniqueIdentifier>{68db4fae-5dfb-4f42-af70-34ffc1eb7bea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="RayTracer.props" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Vector3.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -53,10 +55,12 @@
     <ClInclude Include="DataTypes.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Vector3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -71,6 +75,9 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>renderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
