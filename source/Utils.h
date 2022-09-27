@@ -82,8 +82,8 @@ namespace dae
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			float rayToIntersect = Vector3::Dot((plane.origin - ray.direction), plane.normal) / Vector3::Dot(ray.direction, plane.normal);
-			if (rayToIntersect > 0.00001 && rayToIntersect < FLT_MAX)
+			float rayToIntersect = Vector3::Dot((plane.origin - ray.origin), plane.normal) / Vector3::Dot(ray.direction, plane.normal);
+			if (rayToIntersect > ray.min && rayToIntersect < ray.max)
 			{
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = plane.materialIndex;

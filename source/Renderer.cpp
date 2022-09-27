@@ -23,22 +23,23 @@ Renderer::Renderer(SDL_Window * pWindow) :
 
 void Renderer::Render(Scene* pScene) const
 {
+	
 	Camera& camera = pScene->GetCamera();
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
-	
+	float fov{ std::tan(camera.fovAngle / 2) };
 	//loop over pixels
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			float x = ((2 * ((px + 0.5f) / m_Width)) -1) * (float(m_Width) / float(m_Height));
-			float y = (1 - 2 * ((py + 0.5f) / m_Height));
+			float x = ((2 * ((px + 0.5f) / m_Width)) -1) * (float(m_Width) / float(m_Height)) * fov;
+			float y = (1 - 2 * ((py + 0.5f) / m_Height)) * fov;
 
 			Vector3 rayDirection{ x,y,1};
 			rayDirection.Normalize();
 			
-			Ray viewRay{ {0,0,0},rayDirection };
+			Ray viewRay{ camera.origin,rayDirection };
 
 			ColorRGB finalColor{};
 
