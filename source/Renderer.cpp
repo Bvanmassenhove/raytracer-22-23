@@ -38,7 +38,7 @@ void Renderer::Render(Scene* pScene) const
 			Vector3 rayDirection{ x,y,1};
 			rayDirection.Normalize();
 			
-			Ray viewRay{ {0,0,-50},rayDirection };
+			Ray viewRay{ {0,0,0},rayDirection };
 
 			ColorRGB finalColor{};
 

@@ -13,9 +13,10 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
+			hitRecord.didHit = false;
 			//todo W1
 			
-			Vector3 rayToSphere{ sphere.origin - ray.origin };
+			/*Vector3 rayToSphere{ sphere.origin - ray.origin };
 			float rayToPerpendicular{ Vector3::Dot(rayToSphere, ray.direction) };
 
 			float originToPerpendicularSquared{ rayToSphere.Magnitude() * 2 - rayToPerpendicular * 2};
@@ -24,11 +25,11 @@ namespace dae
 				float intercectPoint{ sqrt((sphere.radius * 2) - (originToPerpendicularSquared * 2)) };
 				float rayToIntersect{ rayToPerpendicular - intercectPoint };
 				Vector3 intersectVector{ ray.origin + ray.direction * rayToIntersect };
-				if (intersectVector.Magnitude() > 0.0001f)
+				if (intersectVector.Magnitude() > ray.min)
 				{
 					hitRecord.didHit = true;
 					hitRecord.materialIndex = sphere.materialIndex;
-					hitRecord.normal = intersectVector - sphere.origin;
+					hitRecord.normal = intersectVector;
 					hitRecord.normal.Normalize();
 					hitRecord.origin = intersectVector;
 					hitRecord.t = -intersectVector.Magnitude();
@@ -36,7 +37,38 @@ namespace dae
 					return true;
 				}
 			}
-			return false;		
+			return false;		*/
+
+			const float a{ Vector3::Dot(ray.direction, ray.direction) };
+			const float b{ Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin) };
+			const float c{ Vector3::Dot(ray.origin - sphere.origin,ray.origin - sphere.origin) - sphere.radius * sphere.radius };
+			const float dis{ b * b - 4 * (a * c) };
+
+
+			if (dis < 0)
+			{
+				return false;
+			}
+			else
+			{
+				float t{ (-b - std::sqrt(dis)) / (2 * a) };
+				if (t < ray.min)
+				{
+					t = { (-b + std::sqrt(dis)) / (2 * a) };
+				}
+				if (t >= ray.min && t <= ray.max)
+				{
+					hitRecord.didHit = true;
+					hitRecord.materialIndex = sphere.materialIndex;
+					hitRecord.origin = (ray.origin + t * ray.direction);
+					hitRecord.normal = hitRecord.origin - sphere.origin;
+					hitRecord.normal.Normalize();
+					hitRecord.t = t;
+					return true;
+				}
+				
+			}
+			return false;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
