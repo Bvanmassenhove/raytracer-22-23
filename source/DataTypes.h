@@ -163,7 +163,7 @@ namespace dae
 		Vector3 origin{};
 		Vector3 direction{};
 
-		float min{ 0.0001f };
+		float min{ 0.001f };
 		float max{ FLT_MAX };
 	};
 

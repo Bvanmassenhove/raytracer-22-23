@@ -138,8 +138,13 @@ namespace dae {
 	Matrix Matrix::CreateRotation(const Vector3& r)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+
+		Matrix rotation{};
+		rotation[0] = { cos(r.x)			,0.f		,sin(r.x)				,0.f };
+		rotation[1] = { sin(r.x) * sin(r.y)	,cos(r.y)	,-sin(r.y) * sin(r.x)	,0.f };
+		rotation[2] = {-cos(r.y) * sin(r.x)	, sin(r.y)	,cos(r.y)* cos(r.x)		,0.f};
+		rotation[3] = { 0.f					,0.f		,0.f					,1.f};
+		return rotation;
 	}
 
 	Matrix Matrix::CreateRotation(float pitch, float yaw, float roll)
