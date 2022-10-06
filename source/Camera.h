@@ -89,7 +89,7 @@ namespace dae
 				camVelocity *= 0.f;
 			}
 
-			origin += camVelocity * pTimer->GetElapsed();
+			origin += camVelocity * deltaTime;
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
@@ -106,21 +106,21 @@ namespace dae
 					origin += forward * -float(mouseY);
 				}
 
-				totalYaw += camRotation * -mouseX * pTimer->GetElapsed();
+				totalYaw += camRotation * -mouseX * deltaTime;
 				finalRotation = Matrix::CreateRotation(totalYaw, 0.f, 0.f);
 				
 			}
 			else if (mouseState == SDL_BUTTON(SDL_BUTTON_RIGHT))
 			{
-				totalYaw += camRotation * -mouseX * pTimer->GetElapsed();
-				totalPitch += camRotation * -mouseY * pTimer->GetElapsed();
+				totalYaw += camRotation * -mouseX * deltaTime;
+				totalPitch += camRotation * -mouseY * deltaTime;
 
 				finalRotation = Matrix::CreateRotation(totalYaw, totalPitch, 0.f);
-
+				
 			}
-
 			forward = finalRotation.TransformVector(Vector3::UnitZ);
 			forward.Normalize();
+			
 			//todo: W2
 			//assert(false && "Not Implemented Yet");
 		}

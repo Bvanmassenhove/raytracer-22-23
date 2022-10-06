@@ -29,6 +29,8 @@ void Renderer::Render(Scene* pScene) const
 	auto& lights = pScene->GetLights();
 	float fov{ std::tan(camera.fovAngle / 2) };
 	//loop over pixels
+
+#pragma omp parallel for
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
