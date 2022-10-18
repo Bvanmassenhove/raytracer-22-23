@@ -57,14 +57,56 @@ void Renderer::Render(Scene* pScene) const
 					Vector3 LightVector = LightUtils::GetDirectionToLight(light, closestHit.origin);
 					Ray ShadowRay{ closestHit.origin ,LightVector.Normalized() };
 					ShadowRay.max = LightVector.Magnitude();
-					if (pScene->DoesHit(ShadowRay))
+					float dot = Vector3::Dot( LightVector.Normalized(), closestHit.normal);
+					LightVector.Normalize();
+					if (dot >= 0)
 					{
-						finalColor = materials[closestHit.materialIndex]->Shade()*.5f;
+						switch (m_CurrentLightingMode)
+						{
+						case LightingMode::observedArea:
+							
+							if (pScene->DoesHit(ShadowRay) && m_ShadowsEnabled)
+							{
+								finalColor += ColorRGB{ 1.f,1.f,1.f } * dot *.5f;
+							}
+							else
+							{
+								finalColor += ColorRGB{ 1.f,1.f,1.f } *dot;
+							}
+							break;
+						case LightingMode::Radience:
+							if (pScene->DoesHit(ShadowRay) && m_ShadowsEnabled)
+							{
+								finalColor += LightUtils::GetRadiance(light, closestHit.origin) * dot * .5f;
+							}
+							else
+							{
+								finalColor += LightUtils::GetRadiance(light, closestHit.origin) * dot;
+							}
+							break;
+						case LightingMode::BDRF:
+							if (pScene->DoesHit(ShadowRay) && m_ShadowsEnabled)
+							{
+								finalColor += materials[closestHit.materialIndex]->Shade(closestHit, LightVector, -viewRay.direction) * .5f;
+							}
+							else
+							{
+								finalColor +=materials[closestHit.materialIndex]->Shade(closestHit, LightVector, -viewRay.direction);
+							}
+							break;
+						case LightingMode::Combined:
+							if (pScene->DoesHit(ShadowRay) && m_ShadowsEnabled)
+							{
+								finalColor += LightUtils::GetRadiance(light, closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, LightVector, -viewRay.direction) * dot * .5f;
+							}
+							else
+							{
+								finalColor += LightUtils::GetRadiance(light, closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, LightVector, -viewRay.direction) * dot;
+							}
+							break;
+						}
 					}
-					else
-					{
-						finalColor = materials[closestHit.materialIndex]->Shade() ;
-					}
+					
 				}
 			}
 			//Update Color in Buffer

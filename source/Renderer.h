@@ -22,8 +22,41 @@ namespace dae
 
 		void Render(Scene* pScene) const;
 		bool SaveBufferToImage() const;
+		void SwitchShadows()
+		{
+			m_ShadowsEnabled = !m_ShadowsEnabled;
+		}
+		void scycleLightMode()
+		{
+			switch (m_CurrentLightingMode)
+			{
+			case LightingMode::observedArea:
+				m_CurrentLightingMode = LightingMode::Radience;
+				break;
+			case LightingMode::Radience:
+				m_CurrentLightingMode = LightingMode::BDRF;
+				break;
+			case LightingMode::BDRF:
+				m_CurrentLightingMode = LightingMode::Combined;
+				break;
+			case LightingMode::Combined:
+				m_CurrentLightingMode = LightingMode::observedArea;
+				break;
+			}
+		}
 
 	private:
+
+		enum class LightingMode
+		{
+			observedArea, //lambert Law
+			Radience, //Incident Radiance
+			BDRF, //Scattering of the Light
+			Combined // observedArea*Radiance*BDRF
+		};
+		LightingMode m_CurrentLightingMode{ LightingMode::Combined };
+		bool m_ShadowsEnabled{ true };
+
 		SDL_Window* m_pWindow{};
 
 		SDL_Surface* m_pBuffer{};

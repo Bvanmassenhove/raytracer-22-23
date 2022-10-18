@@ -195,4 +195,66 @@ namespace dae {
 		
 	}
 #pragma endregion
+
+#pragma region SCENE W3
+	void Scene_W3::Initialize()
+	{
+		m_Camera.origin = { 0.f,3.f,-9.f };
+		m_Camera.fovAngle = 45.f * TO_RADIANS;
+
+		const auto mathCT_GrayRoughMetal = AddMaterial(new Material_CookTorrence({ .972f,.960f,.915f }, 1.f, 1.f));
+		const auto mathCT_GrayMediumMetal = AddMaterial(new Material_CookTorrence({ .972f,.960f,.915f }, 1.f, .6f));
+		const auto mathCT_GraySmoothMetal = AddMaterial(new Material_CookTorrence({ .972f,.960f,.915f }, 1.f, .1f));
+		const auto mathCT_GrayRoughPlastic = AddMaterial(new Material_CookTorrence({ .75f,.75f,.75f }, 0.f, 1.f));
+		const auto mathCT_GrayMediumPlastic = AddMaterial(new Material_CookTorrence({ .75f,.75f,.75f }, 0.f, .6f));
+		const auto mathCT_GraySmoothPlastic = AddMaterial(new Material_CookTorrence({ .75f,.75f,.75f }, 0.f, .1f));
+
+		const auto mathLambert_GrayBlue = AddMaterial(new Material_Lambert({.49f,.57f,.57f},1.f));
+
+		//Plane
+		AddPlane({ 0.f, 0.f, 10.f }, { 0.f, 0.f,-1.f }, mathLambert_GrayBlue);//BACK
+		AddPlane({ 0.f, 0.f, 0.f }, { 0.f, 1.f,0.f }, mathLambert_GrayBlue);//BOTTOM
+		AddPlane({ 0.f, 10.f, 0.f }, { 0.f, -1.f,0.f }, mathLambert_GrayBlue);//TOP
+		AddPlane({ 5.f, 0.f, 0.f }, { -1.f, 0.f,0.f }, mathLambert_GrayBlue);//RIGHT
+		AddPlane({ -5.f, 0.f, 0.f }, { 1.f, 0.f,0.f }, mathLambert_GrayBlue);//LEFT
+
+		//Spheres
+		AddSphere({ -1.75f, 1.f, 0.f }, .75f,mathCT_GrayRoughMetal);
+		AddSphere({ 0.f, 1.f, 0.f }, .75f,mathCT_GrayMediumMetal);
+		AddSphere({ 1.75f, 1.f, 0.f }, .75f,mathCT_GraySmoothMetal);
+		AddSphere({ -1.75f, 3.f, 0.f }, .75f,mathCT_GrayRoughPlastic);
+		AddSphere({ 0.f, 3.f, 0.f }, .75f,mathCT_GrayMediumPlastic);
+		AddSphere({ 1.75f, 3.f, 0.f }, .75f,mathCT_GraySmoothPlastic);
+
+		//light
+		AddPointLight({ 0.f,5.f,5.f }, 50.f, ColorRGB{1.f,.61f,.45f}); //backlight
+		AddPointLight({ -2.5f,5.f,-5.f }, 70.f, ColorRGB{1.f,.8f,.45f}); //front lights
+		AddPointLight({ 2.5f,2.5f,-5.f }, 50.f, ColorRGB{.34f,.47f,.68f});
+
+		//m_Camera.origin = { 0.f,1.f,-5.f };
+		//m_Camera.fovAngle = 45.f * TO_RADIANS;
+
+		//const auto mathlambert_red = AddMaterial(new Material_Lambert(colors::Red, 1.f));
+		//const auto mathlambert_Blue = AddMaterial(new Material_LambertPhong(colors::Blue, 1.f,1.f,60.f));
+		//const auto mathlambert_Yellow = AddMaterial(new Material_Lambert(colors::Yellow, 1.f));
+
+		////Plane
+		//AddPlane({ 0.f, 0.f, 0.f }, { 0.f, 1.f,0.f }, mathlambert_Yellow);
+		//
+
+		////Spheres
+		//AddSphere({ -.75f, 1.f, 0.f }, 1.f, mathlambert_red);
+		//AddSphere({ .75f, 1.f, 0.f }, 1.f, mathlambert_Blue);
+		//
+
+		////light
+		//AddPointLight({ 0.f,5.f,5.f }, 25.f, colors::White);
+
+		//AddPointLight({ 0.f,2.5f,-5.f }, 25.f, colors::White);
+
+
+	}
+#pragma endregion
+
 }
+
