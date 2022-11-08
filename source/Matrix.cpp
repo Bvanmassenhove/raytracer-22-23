@@ -124,7 +124,11 @@ namespace dae {
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
+		Matrix rotMatrix{};
+		rotMatrix[0][0] = std::cos(yaw);
+		rotMatrix[0][2] = -std::sin(yaw);
+		rotMatrix[2][0] = std::sin(yaw);
+		rotMatrix[2][2] = std::cos(yaw);
 		return {};
 	}
 

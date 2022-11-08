@@ -116,7 +116,6 @@ namespace dae
 				totalPitch += camRotation * -mouseY * deltaTime;
 
 				finalRotation = Matrix::CreateRotation(totalYaw, totalPitch, 0.f);
-				
 			}
 			forward = finalRotation.TransformVector(Vector3::UnitZ);
 			forward.Normalize();

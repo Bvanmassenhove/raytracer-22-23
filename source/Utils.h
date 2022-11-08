@@ -88,14 +88,16 @@ namespace dae
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = plane.materialIndex;
 				hitRecord.normal = plane.normal;
-				hitRecord.origin = ray.origin + rayToIntersect*ray.direction;
+				hitRecord.origin = ray.origin + rayToIntersect * ray.direction;
 				hitRecord.t = rayToIntersect;
-				return true ;
+				return true;
+				
 			}
 			else
 			{
 				return false;
 			}
+		
 		}
 
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray)
@@ -109,8 +111,61 @@ namespace dae
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W5
-			assert(false && "No Implemented Yet!");
-			return false;
+			switch (triangle.cullMode)
+			{
+			case TriangleCullMode::BackFaceCulling:
+				if (Vector3::Dot(triangle.normal, ray.direction) > 0)
+				{
+					return false;
+				}
+				break;
+			case  TriangleCullMode::FrontFaceCulling:
+				if (Vector3::Dot(triangle.normal, ray.direction) < 0)
+				{
+					return false;
+				}
+				break;
+			}
+			if (Vector3::Dot(triangle.normal, ray.direction) == 0)
+			{
+				return false;
+			}
+
+			Vector3 center = (triangle.v0 + triangle.v1 + triangle.v2) / 3;
+			Vector3 L = center - ray.origin;
+			float rayToIntersect = Vector3::Dot(L, triangle.normal) / Vector3::Dot(ray.direction, triangle.normal);
+			if (rayToIntersect < ray.min && rayToIntersect > ray.max)
+			{
+				return false;
+			}
+
+			Vector3 P = ray.origin + rayToIntersect * ray.direction;
+			Vector3 edgeA = triangle.v1 - triangle.v0;
+			Vector3 edgeB = triangle.v2 - triangle.v0;
+			Vector3 edgeC = triangle.v2 - triangle.v1;
+			Vector3 pointToSideA = P - triangle.v0;
+			Vector3 pointToSideB = P - triangle.v1;
+
+			if (Vector3::Dot(triangle.normal,Vector3::Cross(edgeA,pointToSideA)) < 0)
+			{
+				return false;
+			}
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(edgeB, pointToSideA)) > 0)
+			{
+				return false;
+			}
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(edgeC, pointToSideB)) < 0)
+			{
+				return false;
+			}
+			
+
+			hitRecord.didHit = true;
+			hitRecord.materialIndex = triangle.materialIndex;
+			hitRecord.normal = triangle.normal;
+			hitRecord.origin = ray.origin + rayToIntersect * ray.direction;
+			hitRecord.t = rayToIntersect;
+			return true;
 		}
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray)
@@ -122,8 +177,73 @@ namespace dae
 #pragma region TriangeMesh HitTest
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
+			//slabtest
+			/*if (!SlabTest_TriangleMesh(mesh, ray))
+			{
+				return false;
+			}*/
 			//todo W5
-			assert(false && "No Implemented Yet!");
+
+			for (int i = 0; i < mesh.normals.size(); ++i)
+			{
+
+				switch (mesh.cullMode)
+				{
+				case TriangleCullMode::BackFaceCulling:
+					if (Vector3::Dot(mesh.normals[i], ray.direction) > 0)
+					{
+						continue;
+					}
+					break;
+				case  TriangleCullMode::FrontFaceCulling:
+					if (Vector3::Dot(mesh.normals[i], ray.direction) < 0)
+					{
+						continue;
+					}
+					break;
+				}
+				if (Vector3::Dot(mesh.normals[i], ray.direction) == 0)
+				{
+					continue;
+				}
+
+				Vector3 center = (mesh.positions[mesh.indices[0 + 3 * i]] + mesh.positions[mesh.indices[1 + 3 * i]] + mesh.positions[mesh.indices[2 + 3 * i]]) / 3;
+				Vector3 L = center - ray.origin;
+				float rayToIntersect = Vector3::Dot(L, mesh.normals[i]) / Vector3::Dot(ray.direction, mesh.normals[i]);
+				if (rayToIntersect < ray.min && rayToIntersect > ray.max)
+				{
+					continue;
+				}
+
+				Vector3 P = ray.origin + rayToIntersect * ray.direction;
+				Vector3 edgeA = mesh.positions[mesh.indices[1 + 3 * i]] - mesh.positions[mesh.indices[0 + 3 * i]];
+				Vector3 edgeB = mesh.positions[mesh.indices[2 + 3 * i]] - mesh.positions[mesh.indices[0 + 3 * i]];
+				Vector3 edgeC = mesh.positions[mesh.indices[2 + 3 * i]] - mesh.positions[mesh.indices[1 + 3 * i]];
+				Vector3 pointToSideA = P - mesh.positions[mesh.indices[0 + 3 * i]];
+				Vector3 pointToSideB = P - mesh.positions[mesh.indices[1 + 3 * i]];
+
+				if (Vector3::Dot(mesh.normals[i], Vector3::Cross(edgeA, pointToSideA)) < 0)
+				{
+					continue;
+				}
+				if (Vector3::Dot(mesh.normals[i], Vector3::Cross(edgeB, pointToSideA)) > 0)
+				{
+					continue;
+				}
+				if (Vector3::Dot(mesh.normals[i], Vector3::Cross(edgeC, pointToSideB)) < 0)
+				{
+					continue;
+				}
+
+
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = mesh.materialIndex;
+				hitRecord.normal = mesh.normals[i];
+				hitRecord.origin = ray.origin + rayToIntersect * ray.direction;
+				hitRecord.t = rayToIntersect;
+				return true;
+			}
+
 			return false;
 		}
 
@@ -131,6 +251,29 @@ namespace dae
 		{
 			HitRecord temp{};
 			return HitTest_TriangleMesh(mesh, ray, temp, true);
+		}
+
+		inline bool SlabTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)
+		{
+			float tx1 = (mesh.transformedminAABB.x - ray.origin.x) / ray.direction.x;
+			float tx2 = (mesh.transformedminAABB.x - ray.origin.x) / ray.direction.x;
+
+			float tmin = std::min(tx1, tx2);
+			float tmax = std::max(tx1, tx2);
+
+			float ty1 = (mesh.transformedminAABB.y - ray.origin.y) / ray.direction.y;
+			float ty2 = (mesh.transformedminAABB.y - ray.origin.y) / ray.direction.y;
+
+			tmin = std::min(tmin, std::min(ty1, ty2));
+			tmax = std::max(tmax, std::max(ty1, ty2));
+
+			float tz1 = (mesh.transformedminAABB.z - ray.origin.z) / ray.direction.z;
+			float tz2 = (mesh.transformedminAABB.z - ray.origin.z) / ray.direction.z;
+
+			tmin = std::min(tmin, std::min(tz1, tz2));
+			tmax = std::max(tmax, std::max(tz1, tz2));
+
+			return tmax > 0 && tmax >= tmin;
 		}
 #pragma endregion
 	}
